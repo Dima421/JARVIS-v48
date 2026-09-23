@@ -1,4 +1,4 @@
-name: .github/workflows/build-from-zip.yml
+name: Build JARVIS v48 from ZIP
 
 on:
   workflow_dispatch:
