@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,12 +22,17 @@ jobs:
           java-version: "17"
 
       - name: Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools"
 
       - name: Install Android SDK packages
         run: |
           yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
 
       - name: Extract project
         run: |
@@ -47,12 +53,17 @@ jobs:
         working-directory: JARVIS_v48/android
         run: |
           gradle --no-daemon assembleRelease
+
           keytool -genkeypair -v \
             -keystore jarvis-ci-release.keystore \
-            -storepass jarvis-ci -keypass jarvis-ci \
-            -alias jarvis-ci -keyalg RSA -keysize 2048 \
+            -storepass jarvis-ci \
+            -keypass jarvis-ci \
+            -alias jarvis-ci \
+            -keyalg RSA \
+            -keysize 2048 \
             -validity 3650 \
             -dname "CN=JARVIS CI, OU=JARVIS, O=JARVIS, C=US"
+
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign \
             --ks jarvis-ci-release.keystore \
             --ks-pass pass:jarvis-ci \
